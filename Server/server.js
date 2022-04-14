@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const mongo = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 const cors = require('cors');
 
 // inititialize express app
@@ -8,89 +8,81 @@ const app = express();
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+//app.use(cors());
 
-// DB connection setup
-const url = process.env.DB_URL;
-
-let db, products, prices;
-mongo.connect(
-  url,
-  {
-    useNewUrlParser:true
-  },
-  (err, client)=>{
-    if(err){
-      console.log(err)
-      return
-    }
-    db = client.db('keaboutique')
-    products = db.collection('products')
-    prices = db.collection('prices')
+// Schema setup
+const Schema = mongoose.Schema;
+const productSchema =new Schema({
+  title:{
+    type:String,
+    required:true
   }
-);
+});
+const shoppingSchema =new Schema({
+  product: {
+    type:String,
+    required:true
+  },
+    date:{
+      type:Date,
+      default:Date.now
+    },
+    amount:{
+      type: Number,
+      required:true
+    },
+    category:{
+      type: String,
+      required:true
+    }
+});
+
+// make models out schemas
+const Product = mongoose.model('products', productSchema);
+const Shopping = mongoose.model('shoppings', shoppingSchema);
+
+
 
 // Started as stubs for the API built slowly up
-app.post('/product', (req,res) => {
-  const title = req.body.title;
-  products.insertOne(
-    {title: title}, (err, result) => {
+app.post('/product', async(req,res) => {
+  const product = new Product(req.body);
+  // save product to the db
+  await product.save();
+  return res.json(product);
+});
 
-      if(err){
-        console.log(err)
-        res.status(500).json({err : err})
-      }
+app.get('/products', async(req,res) => {
+ 
+  const products = await Product.find({}, {_id:0, __v:0})
 
-      console.log(result)
-      res.status(201).json({ok : true});
-    })
-})
+  return res.status(200).json({products: products})
+});
 
-app.get('/products', (req,res) => {
-  products.find().toArray((err, items) => {
-    if(err){
-      console.log(err)
-      res.status(500).json({err : err})
-      return
-    }
-    res.status(200).json({products : items})
-  });
-})
-// Endpoint to add new price look like this:
-// POST /price { product, date, qty, category}
 
-app.post('/price', (req,res) => {
-  prices.insertOne({
-    product : req.body.product,
-    date: req.body.date,
-    qty : req.body.qty,
-    category : req.body.category,
-  },
-  (err, result) => {
-    if(err) {
-      console.error(err)
-      res.status(500).json({err:err})
-      return
-    }
-    res.status(201).json({ ok: true})
-  }
-   
-  )
-})
+app.post('/shopping', async(req,res) => {
+  
+  const shopping = new Shopping(req.body)
+  // save shopping to the db
+  await shopping.save();
+  return res.json(shopping)
+});
 
-app.get('/prices', (req,res) => {
-  prices.find().toArray((err, items) => {
-    if(err){
-      console.log(err)
-      res.status(500).json({err : err})
-      return
-    }
-    res.status(200).json({prices : items})
-  });
-})
+app.get('/shoppings', async(req,res) => {
+ 
+  const shoppings = await Shopping.find({}, {_id:0, __v:0})
+
+  return res.status(200).json({shoppings : shoppings});
+});
 
 
 
 
 const port = process.env.PORT;
-app.listen(port, () => console.log(`Server ready on port ${port}`));
+app.listen(port, () => {
+  mongoose.connect(process.env.DB_CONNECTION || 'mongodb://localhost/your_preferred_db_name', { useNewUrlParser: true }).then((response) => {
+      console.log(`Connected to MongoDB and server started on PORT ${port}`);
+  }).catch((err) => {
+      console.log(err);
+  })
+});
