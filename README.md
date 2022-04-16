@@ -1,6 +1,6 @@
 # Kea-boutique
 
-# Full stack Svelte Application with MongoDB
+# Svelte Application with MongoDB Atlas Database
 
 Tools and Technologies stack
 
