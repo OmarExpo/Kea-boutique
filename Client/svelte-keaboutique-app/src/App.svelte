@@ -1,4 +1,18 @@
 <script>
+	import { onMount } from 'svelte'; // svelte hook
+
+const endpoint = "http://localhost:4000/api/products";
+
+let prods = [];
+
+onMount(async function () {
+	const response = await fetch(endpoint);
+	const data = await response.json();
+	//console.log(data);
+	prods = data;
+	console.log(products);
+});
+
 	let cart = [];
 	let products = [
 		{id:1, name: 'Apple', image: 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTJ8fGFwcGxlc3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60', price: 10, quantity:1},

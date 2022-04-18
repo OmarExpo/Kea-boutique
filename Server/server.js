@@ -9,18 +9,13 @@ const app = express();
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use(cors());
+app.use(cors());
 
-// Schema setup
+// Schema instance from mongoose schema
 const Schema = mongoose.Schema;
+// create a new schema
 const productSchema =new Schema({
-  title:{
-    type:String,
-    required:true
-  }
-});
-const shoppingSchema =new Schema({
-  product: {
+  name: {
     type:String,
     required:true
   },
@@ -28,56 +23,67 @@ const shoppingSchema =new Schema({
       type:Date,
       default:Date.now
     },
-    amount:{
+    image:{
+      type: String,
+      required:true
+    },
+    price:{
       type: Number,
       required:true
     },
-    category:{
-      type: String,
+    quantity:{
+      type: Number,
       required:true
     }
 });
 
-// make models out schemas
+// Out of mongoose model, creates 'products' collection in the db
 const Product = mongoose.model('products', productSchema);
-const Shopping = mongoose.model('shoppings', shoppingSchema);
 
-
-
-// Started as stubs for the API built slowly up
-app.post('/product', async(req,res) => {
+// CRUD OPERATIONS - Started as stubs for the API 6 built slowly up 
+// Add a product in the database
+app.post('/api/products', async(req,res) => {
   const product = new Product(req.body);
   // save product to the db
   await product.save();
   return res.json(product);
 });
 
-app.get('/products', async(req,res) => {
+// Retrieve all products from the MongoDB Atlas database
+app.get('/api/products', async(req,res) => {
  
   const products = await Product.find({}, {_id:0, __v:0})
 
   return res.status(200).json({products: products})
 });
 
+// delete a product by id
+app.delete('/api/products', async(req,res) => {
+  // fínd product by id and delete
+  await Product.findByIdAndDelete(req.body._id);
 
-app.post('/shopping', async(req,res) => {
-  
-  const shopping = new Shopping(req.body)
-  // save shopping to the db
-  await shopping.save();
-  return res.json(shopping)
+  return res.json({
+    message: 'Product deleted successfully',
+    success: true,
+  });
 });
 
-app.get('/shoppings', async(req,res) => {
- 
-  const shoppings = await Shopping.find({}, {_id:0, __v:0})
+// update product by id
+app.put('/api/products/:id', async(req,res) => {
+  // find product by id and update contents
+  await Product.findOneAndUpdate({_id:req.params.id}, req.body, {new:true}, (err, product)=>{
+    if(err){
+      res.status(500).send(err);
+    }
+    res.status(200).json({message: 'Product deleted successfully',
+    success: true});
+  }).clone();
+    
+  });
 
-  return res.status(200).json({shoppings : shoppings});
-});
 
 
-
-
+// setting up DB connection and port
 const port = process.env.PORT;
 app.listen(port, () => {
   mongoose.connect(process.env.DB_CONNECTION || 'mongodb://localhost/your_preferred_db_name', { useNewUrlParser: true }).then((response) => {
