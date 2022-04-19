@@ -4,7 +4,11 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "build": "npm install --prefix  && npm run build --prefix client",
+    "client": "npm run dev --prefix client",
+    "server": "nodemon server.js --ignore 'client/'",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -17,9 +21,14 @@
   },
   "homepage": "https://github.com/OmarExpo/Kea-boutique#readme",
   "dependencies": {
+    "concurrently": "^7.1.0",
+    "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "mongoose": "^6.2.11"
+    "express-session": "^1.17.2",
+    "mongoose": "^6.2.11",
+    "passport": "^0.5.2",
+    "passport-local-mongoose": "^7.0.0"
   },
   "devDependencies": {
     "dotenv": "^16.0.0",
