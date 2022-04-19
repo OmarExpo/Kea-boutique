@@ -2,7 +2,7 @@
 
 # Svelte Application with MongoDB Atlas Database
 
-Tools and Technologies stack
+<strong>Tools and Technologies stack</strong>
 
 
 V.S.Code (IDE)
@@ -19,9 +19,9 @@ Concurrently (for running both server & client together)
 
 Postman (testing APIs)
 
-Svelte (building UI)
+<strong>Svelte</strong> (building UI)
 
 
 The application can be run by using the following command: 
 
-<npm run dev>
+<strong style:color='blue'>npm run dev</strong>
