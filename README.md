@@ -22,6 +22,7 @@ Postman (testing APIs)
 <strong>Svelte</strong> (building UI)
 
 
+
 The application can be run by using the following command: 
 
-<strong style:color='blue'>npm run dev</strong>
+<strong>npm run dev</strong>
