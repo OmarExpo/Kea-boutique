@@ -22,6 +22,11 @@ Postman (testing APIs)
 <strong>Svelte</strong> (building UI)
 
 
+In MongoDB, there are two collections: products and users.
+
+Full CRUD operations are operational for products (see routes.js).
+
+Users collection is for authentication and session management using 'Passport', 'Passport-local-mongo' 
 
 The application can be run by using the following command: 
 
